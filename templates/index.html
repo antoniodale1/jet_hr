@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jet HR - Calcola il tuo Netto dalla RAL</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <!-- Logo -->
+                <div class="logo">
+                    <span class="logo-jet">JET</span>
+                    <span class="logo-hr">HR</span>
+                </div>
+            
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <h3 class="main-title">Calcola il netto in busta paga di un dipendente a partire dalla RAL</h3>
+            
+            <!-- Input Components Grid -->
+            <div class="input-container">
+                <!-- First Fields Grid (RAL + Tipologia Contratto) -->
+                <div class="input-grid">
+                    <!-- RAL Input -->
+                    <div class="input-wrapper">
+                        <label for="ralInput" class="input-label">RAL (Reddito Annuo Lordo)</label>
+                        <div class="input-field-wrapper">
+                            <input 
+                                type="text" 
+                                id="ralInput" 
+                                class="input-field" 
+                                placeholder="Inserisci la RAL"
+                                inputmode="numeric"
+                                autocomplete="off"
+                            >
+                            <span class="input-currency">€</span>
+                        </div>
+                        <span class="input-error" id="ralError"></span>
+                    </div>
+
+                    <!-- Tipologia Contratto -->
+                    <div class="input-wrapper">
+                        <label for="contractType" class="input-label">Tipologia di Contratto</label>
+                        <div class="select-wrapper">
+                            <select id="contractType" class="select-field">
+                                <option value="tempo-indeterminato">Tempo Indeterminato</option>
+                            </select>
+                        </div>
+                        <span class="input-error" id="contractError"></span>
+                    </div>
+                </div>
+
+                <!-- Second Fields Grid (Dimensione Azienda + Comune di Residenza) -->
+                <div class="input-grid">
+                    <!-- Dimensione Azienda -->
+                    <div class="input-wrapper">
+                        <label for="companySize" class="input-label">Dimensione Azienda</label>
+                        <p class="input-description">Selezionare la dimensione dell'azienda in termini di numero di dipendenti</p>
+                        <div class="select-wrapper">
+                            <select id="companySize" class="select-field">
+                                <option value="false">Fino a 15 dipendenti</option>
+                                <option value="true">Più di 15 dipendenti</option>
+                            </select>
+                        </div>
+                        <span class="input-error" id="companySizeError"></span>
+                    </div>
+
+                    <!-- Comune di Residenza -->
+                    <div class="input-wrapper">
+                        <label for="city" class="input-label">Comune di Residenza</label>
+                        <p class="input-description">Selezionare il comune di residenza al fine del calcolo dell'imposta regionale e comunale</p>
+                        <div class="select-wrapper">
+                            <select id="city" class="select-field">
+                                <option value="milano">Milano</option>
+                            </select>
+                        </div>
+                        <span class="input-error" id="cityError"></span>
+                    </div>
+                </div>
+
+                <!-- Third Fields Grid -->
+                <div class="input-grid">
+                    <!-- Coniuge a Carico -->
+                    <div class="input-wrapper">
+                        <label for="coniugeCarico" class="input-label">Coniuge a Carico</label>
+                        <p class="input-description">Inserire sì se il coniuge è a carico</p>
+                        <div class="toggle-wrapper">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="coniugeCarico">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label" id="coniugeCaricoLabel">No</span>
+                        </div>
+                    </div>
+
+                    <!-- Figli a Carico -->
+                    <div class="input-wrapper">
+                        <label for="figliCarico" class="input-label" style="margin-bottom: 0.25rem;">Figli a Carico</label>
+                        <p class="input-description">Numero di figli a carico: figli fino a 24 anni compiuti se non possiedono redditi propri superiori ad euro 4.000,00, al lordo degli oneri deducibili; o figli oltre 24 anni e altri familiari se non possiedono redditi propri superiori ad euro 2.840,51, al lordo degli oneri deducibili.</p>
+                        <div class="input-container">
+                            <input 
+                                type="number" 
+                                id="figliCarico" 
+                                class="input-field"
+                                min="0"
+                                step="1"
+                                value="0"
+                                placeholder="Numero figli"
+                            >
+                        </div>
+                        <span class="input-error" id="figliError"></span>
+                    </div>
+                </div>
+
+                <!-- Fourth Field - Fondo Pensione -->
+                <div class="input-wrapper">
+                    <label for="fondoPensione" class="input-label">Versamenti Volontari a Fondo Pensione</label>
+                    <p class="input-description">Ammontare dei versamenti volontari nel fondo pensione complementare come percentuale della RAL. I versamenti al fondo pensione sono deducibili fino ad un massimo di € 5.164,57 all'anno.</p>
+                    <div class="input-field-wrapper">
+                        <input 
+                            type="number" 
+                            id="fondoPensione" 
+                            class="input-field"
+                            min="0"
+                            max="15"
+                            step="0.1"
+                            value="0"
+                            placeholder="Inserisci percentuale"
+                        >
+                        <span class="input-currency">%</span>
+                    </div>
+                    <span class="input-error" id="fondoPensioneError"></span>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="button-container">
+                    <button type="button" id="calculateBtn" class="btn-calculate" disabled>Calcola</button>
+                </div>
+
+                <!-- Tabella di Sintesi -->
+                <div id="sintesiSection" class="results-section hidden" style="max-width: 900px;">
+                    <h3 class="results-title">Sintesi Calcolo</h3>
+                    <table class="sintesi-table">
+                        <tbody>
+                            <tr>
+                                <td class="sintesi-label">RAL</td>
+                                <td class="sintesi-value" id="sintesiRAL">€ 0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="sintesi-label">Contributi INPS (<span id="sintesiAliquota">9,49%</span>)</td>
+                                <td class="sintesi-value" id="sintesiContributi">- € 0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="sintesi-label">Imponibile Fiscale</td>
+                                <td class="sintesi-value" id="sintesiImponibile">€ 0,00</td>
+                            </tr>
+                            <tr id="sintesiFondoRow" style="display: none;">
+                                <td class="sintesi-label">Fondo Pensione (<span id="sintesiPercentualeFondo">0%</span>)</td>
+                                <td class="sintesi-value" id="sintesiFondo">- € 0,00</td>
+                            </tr>
+                            <tr id="sintesiImponibileNettoRow" style="display: none;">
+                                <td class="sintesi-label">Imponibile Fiscale Netto Fondo Pensione</td>
+                                <td class="sintesi-value" id="sintesiImponibileNetto">€ 0,00</td>
+                            </tr>
+                            <tr class="sintesi-expandable">
+                                <td class="sintesi-label">
+                                    <button class="sintesi-toggle" id="sintesiIrpefToggle">
+                                        <span>IRPEF Lorda</span>
+                                        <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                                <td class="sintesi-value" id="sintesiIrpef">- € 0,00</td>
+                            </tr>
+                            <tr class="sintesi-breakdown" id="sintesiIrpefBreakdown">
+                                <td colspan="2">
+                                    <table class="sintesi-breakdown-table">
+                                        <tr>
+                                            <td class="sintesi-breakdown-label">Scaglione 1 (0 - €28.000 al 23%)</td>
+                                            <td class="sintesi-breakdown-value" id="sintesiScaglione1">- € 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="sintesi-breakdown-label">Scaglione 2 (€28.000 - €50.000 al 35%)</td>
+                                            <td class="sintesi-breakdown-value" id="sintesiScaglione2">- € 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="sintesi-breakdown-label">Scaglione 3 (oltre €50.000 al 43%)</td>
+                                            <td class="sintesi-breakdown-value" id="sintesiScaglione3">- € 0,00</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="sintesi-expandable">
+                                <td class="sintesi-label">
+                                    <button class="sintesi-toggle" id="sintesiDetrazioniToggle">
+                                        <span>Detrazioni</span>
+                                        <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                                <td class="sintesi-value" id="sintesiDetrazioni">€ 0,00</td>
+                            </tr>
+                            <tr class="sintesi-breakdown" id="sintesiDetrazioniBreakdown">
+                                <td colspan="2">
+                                    <table class="sintesi-breakdown-table">
+                                        <tr>
+                                            <td class="sintesi-breakdown-label">Detrazioni Lavoro Dipendente</td>
+                                            <td class="sintesi-breakdown-value" id="sintesiDetrazioniLavoro">€ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="sintesi-breakdown-label">Ulteriore Detrazione</td>
+                                            <td class="sintesi-breakdown-value" id="sintesiUlterioreDetrazione">€ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="sintesi-breakdown-label">Detrazioni Coniuge a Carico</td>
+                                            <td class="sintesi-breakdown-value" id="sintesiDetrazioniConiuge">€ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="sintesi-breakdown-label">Detrazioni Figli a Carico</td>
+                                            <td class="sintesi-breakdown-value" id="sintesiDetrazioniFigli">€ 0,00</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="sintesi-label">Detrazioni Aggiuntive (ex Bonus Renzi)</td>
+                                <td class="sintesi-value" id="sintesiDetrazioniAggiuntive">€ 0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="sintesi-label">Trattamento Integrativo</td>
+                                <td class="sintesi-value" id="sintesiTrattamento">€ 0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="sintesi-label">Imposta Regionale (Lombardia)</td>
+                                <td class="sintesi-value" id="sintesiImpostaRegionale">- € 0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="sintesi-label">Imposta Comunale (Milano)</td>
+                                <td class="sintesi-value" id="sintesiImpostaComunale">- € 0,00</td>
+                            </tr>
+                            <tr class="sintesi-total">
+                                <td class="sintesi-label-total">Totale Netto</td>
+                                <td class="sintesi-value-total" id="sintesiTotaleNetto">€ 0,00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Mensilità Selection -->
+                    <div class="mensilita-section" style="margin-top: 1.5rem; padding: 1rem; background: var(--gray-100); border-radius: 8px;">
+                        <label style="display: block; margin-bottom: 0.75rem; font-weight: 600; color: var(--text-dark);">Selezionare il numero di mensilità:</label>
+                        <div class="mensilita-options" style="display: flex; gap: 1.5rem; align-items: center;">
+                            <label class="mensilita-radio" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="mensilita" value="12" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-size: 1rem; color: var(--text-dark);">12</span>
+                            </label>
+                            <label class="mensilita-radio" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="mensilita" value="13" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-size: 1rem; color: var(--text-dark);">13</span>
+                            </label>
+                            <label class="mensilita-radio" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="mensilita" value="14" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-size: 1rem; color: var(--text-dark);">14</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Netto Mensile Row -->
+                    <div id="nettoMensileSection" class="hidden" style="margin-top: 1rem;">
+                        <table class="sintesi-table">
+                            <tbody>
+                                <tr style="background: #e8f4f8;">
+                                    <td class="sintesi-label-total" style="color: #3269a8;">Netto Mensile (<span id="mensileScelteLabel">13</span> mensilità)</td>
+                                    <td class="sintesi-value-total" id="sintesiNettoMensile" style="color: #3269a8;">€ 0,00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Ulteriori Dettagli Section (Collapsible) -->
+                <div id="ulterioriDettagliSection" class="results-section hidden" style="margin-top: 2rem;">
+                    <button class="irpef-toggle" id="ulterioriDettagliToggle" style="width: 100%; margin-bottom: 1rem;">
+                        <span>Ulteriori Dettagli</span>
+                        <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="irpef-breakdown hidden" id="ulterioriDettagliContent">
+
+                        <!-- Contributi INPS Section -->
+                        <div id="resultsSection" class="results-section" style="margin-top: 0;">
+                    <h3 class="results-title">Contributi INPS</h3>
+                    <div class="result-item">
+                        <span class="result-label" id="contributiLabel">Contributi INPS (9,49%):</span>
+                        <span class="result-value" id="contributiValue">€ 0,00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Imponibile Fiscale:</span>
+                        <span class="result-value" id="imponibileValue">€ 0,00</span>
+                    </div>
+                    <div class="result-item" id="imponibileNettoFondoItem" style="display: none;">
+                        <span class="result-label">Imponibile Fiscale al Netto Fondo Pensione:</span>
+                        <span class="result-value" id="imponibileNettoFondoValue">€ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- IRPEF Section -->
+                <div id="irpefSection" class="results-section">
+                    <h3 class="results-title">IRPEF</h3>
+                    <div class="result-item">
+                        <span class="result-label">IRPEF Dovuta:</span>
+                        <span class="result-value" id="irpefTotaleValue">€ 0,00</span>
+                    </div>
+                    
+                    <!-- Dettagli Scaglioni (Collapsible) -->
+                    <div class="irpef-details">
+                        <button class="irpef-toggle" id="irpefToggle">
+                            <span>Mostra dettagli scaglioni</span>
+                            <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="irpef-breakdown hidden" id="irpefBreakdown">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Scaglione 1 (0 - €28.000 al 23%):</span>
+                                <span class="breakdown-value" id="scaglione1Value">€ 0,00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Scaglione 2 (€28.000 - €50.000 al 35%):</span>
+                                <span class="breakdown-value" id="scaglione2Value">€ 0,00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Scaglione 3 (oltre €50.000 al 43%):</span>
+                                <span class="breakdown-value" id="scaglione3Value">€ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detrazioni Section (Aggregated) -->
+                <div id="detrazioniSection" class="results-section">
+                    <h3 class="results-title">Detrazioni</h3>
+                    <div class="result-item">
+                        <span class="result-label">Totale Detrazioni:</span>
+                        <span class="result-value" id="detrazioniTotaleValue">€ 0,00</span>
+                    </div>
+                    
+                    <!-- Dettagli Detrazioni (Collapsible) -->
+                    <div class="irpef-details">
+                        <button class="irpef-toggle" id="detrazioniToggle">
+                            <span>Mostra dettagli detrazioni</span>
+                            <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="irpef-breakdown hidden" id="detrazioniBreakdown">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Detrazioni Lavoro Dipendente:</span>
+                                <span class="breakdown-value" id="detrazioniValue">€ 0,00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Ulteriore Detrazione:</span>
+                                <span class="breakdown-value" id="ulterioreDetrazioneValue">€ 0,00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Detrazioni Coniuge a Carico:</span>
+                                <span class="breakdown-value" id="detrazioniConiugeValue">€ 0,00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Detrazioni Figli a Carico:</span>
+                                <span class="breakdown-value" id="detrazioniFigliValue">€ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detrazione Aggiuntiva Section (ex Bonus Renzi) -->
+                <div id="detrazioneAggiuntiveSection" class="results-section">
+                    <h3 class="results-title">Detrazioni Aggiuntive da Lavoro (ex Bonus Renzi)</h3>
+                    <div class="result-item">
+                        <span class="result-label">Detrazioni Aggiuntive:</span>
+                        <span class="result-value" id="detrazioneAggiuntiveValue">€ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Trattamento Integrativo Section -->
+                <div id="trattamentoIntegrativoSection" class="results-section">
+                    <h3 class="results-title">Trattamento Integrativo</h3>
+                    <div class="result-item">
+                        <span class="result-label">Trattamento Integrativo:</span>
+                        <span class="result-value" id="trattamentoIntegrativoValue">€ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Imposta Regionale Section -->
+                <div id="impostaRegionaleSection" class="results-section">
+                    <h3 class="results-title">Imposta Regionale</h3>
+                    <div class="result-item">
+                        <span class="result-label">Imposta Regionale:</span>
+                        <span class="result-value" id="impostaRegionaleValue">€ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Imposta Comunale Section -->
+                <div id="impostaComunaleSection" class="results-section">
+                    <h3 class="results-title">Imposta Comunale</h3>
+                    <div class="result-item">
+                        <span class="result-label">Imposta Comunale:</span>
+                        <span class="result-value" id="impostaComunaleValue">€ 0,00</span>
+                    </div>
+                </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
