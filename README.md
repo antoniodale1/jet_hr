@@ -1,10 +1,10 @@
-# Jet HR - Calcolatore RAL to Netto
+# Calcolatore RAL to Netto
 
 Applicazione web Python Flask per il calcolo completo dello stipendio netto dalla RAL (Reddito Annuo Lordo), conforme alla normativa fiscale italiana 2024.
 
 ## 📋 Descrizione
 
-Jet HR è un calcolatore professionale che permette di calcolare con precisione lo stipendio netto annuale e mensile a partire dalla RAL, considerando tutti i parametri fiscali e contributivi italiani:
+L'app è un calcolatore professionale che permette di calcolare con precisione lo stipendio netto annuale e mensile a partire dalla RAL, considerando tutti i parametri fiscali e contributivi italiani:
 
 - **Contributi INPS** (9,19% o 9,49% a seconda della dimensione aziendale)
 - **IRPEF** con calcolo per scaglioni (23%, 35%, 43%)
