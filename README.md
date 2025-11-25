@@ -1,6 +1,6 @@
 # Calcolatore RAL to Netto
 
-Applicazione web Python Flask per il calcolo completo dello stipendio netto dalla RAL (Reddito Annuo Lordo), conforme alla normativa fiscale italiana 2024.
+Applicazione web Python Flask per il calcolo completo dello stipendio netto dalla RAL (Reddito Annuo Lordo), conforme alla normativa fiscale italiana 2025.
 
 ## 📋 Descrizione
 
