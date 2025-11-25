@@ -67,8 +67,8 @@
                         <p class="input-description">Selezionare la dimensione dell'azienda in termini di numero di dipendenti</p>
                         <div class="select-wrapper">
                             <select id="companySize" class="select-field">
-                                <option value="false">Fino a 15 dipendenti</option>
-                                <option value="true">Più di 15 dipendenti</option>
+                                <option value="false">Fino a 50 dipendenti</option>
+                                <option value="true">Più di 50 dipendenti</option>
                             </select>
                         </div>
                         <span class="input-error" id="companySizeError"></span>
@@ -170,6 +170,11 @@
                             <tr id="sintesiImponibileNettoRow" style="display: none;">
                                 <td class="sintesi-label">Imponibile Fiscale Netto Fondo Pensione</td>
                                 <td class="sintesi-value" id="sintesiImponibileNetto">€ 0,00</td>
+                            </tr>
+                            <tr id="sintesiNotaFondoRow" style="display: none;">
+                                <td colspan="2" class="sintesi-nota" id="sintesiNotaFondo">
+                                    <small style="color: #666; font-style: italic;">Nota: Solo € 5.164,57 del versamento al fondo pensione è deducibile ai fini fiscali</small>
+                                </td>
                             </tr>
                             <tr class="sintesi-expandable">
                                 <td class="sintesi-label">

@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sintesiFondo = document.getElementById('sintesiFondo');
     const sintesiImponibileNettoRow = document.getElementById('sintesiImponibileNettoRow');
     const sintesiImponibileNetto = document.getElementById('sintesiImponibileNetto');
+    const sintesiNotaFondoRow = document.getElementById('sintesiNotaFondoRow');
     const sintesiIrpefToggle = document.getElementById('sintesiIrpefToggle');
     const sintesiIrpef = document.getElementById('sintesiIrpef');
     const sintesiIrpefBreakdown = document.getElementById('sintesiIrpefBreakdown');
@@ -313,9 +314,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 sintesiImponibileNetto.textContent = formatEuro(data.imponibile_netto_fondo);
                 sintesiFondoRow.style.display = 'table-row';
                 sintesiImponibileNettoRow.style.display = 'table-row';
+                
+                // Mostra nota se il versamento supera il limite deducibile
+                if (data.versamento_fondo_pensione > 5164.57) {
+                    sintesiNotaFondoRow.style.display = 'table-row';
+                } else {
+                    sintesiNotaFondoRow.style.display = 'none';
+                }
             } else {
                 sintesiFondoRow.style.display = 'none';
                 sintesiImponibileNettoRow.style.display = 'none';
+                sintesiNotaFondoRow.style.display = 'none';
             }
             
             // Aggiorna IRPEF nella sintesi
